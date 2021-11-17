@@ -24,10 +24,8 @@ public class SchedulerGUI extends javax.swing.JFrame {
     /**
      * Creates new form SchedulerGUI
      */
-    public SchedulerGUI(List<Process> processList) {
+    public SchedulerGUI() {
         initComponents();
-        // Copy process list
-        this.processList = processList;
         // Setup process table
         processQueueModel = (DefaultTableModel) processQueueTable.getModel();
         reportTableModel = (DefaultTableModel) reportTable.getModel();

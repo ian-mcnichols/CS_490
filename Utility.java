@@ -65,16 +65,15 @@ public final class Utility {
         return processList;
     }
 
-    public static int getResponseRatio(Process checkProcess){
+    public static float getResponseRatio(Process checkProcess){
         int waitTime = Utility.getSystemClock() - checkProcess.getArrivalTime();
         int burstTime = checkProcess.getServiceTime();
-        int responseRatio = (waitTime + burstTime) / burstTime;
-        return responseRatio;
+        return (float) ((waitTime + burstTime) / burstTime);
     }
 
     public static Process getHRRNProcess() throws Exception {
         Process returnProcess = null;
-        int highestRR = -1;
+        float highestRR = -1;
         System.out.println("Waiting processes: " + waitingProcessesHRRN.toString());
         for (Process p : waitingProcessesHRRN){
             System.out.println(p.getProcessId() + " response ratio: " + getResponseRatio(p));
@@ -91,15 +90,15 @@ public final class Utility {
         }
     }
 
-    public static void checkForProcesses(List<Process> processList) {
+    public static void checkForProcessesHRRN(List<Process> processList) {
         for (int i = 0; i < processList.size(); i++) {
             Process tempProcess = processList.get(i);
             // If a process has arrived
-            if (tempProcess.getArrivalTime() <= Utility.getSystemClock()) {
+            if (tempProcess.getArrivalTime() <= getSystemClock()) {
+                System.out.println("Arrival time: " + tempProcess.getArrivalTime());
+                System.out.println("Current time: " + getSystemClock());
                 // Add the process to the waiting list
-                Utility.addWaitingProcessHRRN(tempProcess);
-                // Update the waiting process table
-                //gui.populateProcessTable();
+                addWaitingProcessHRRN(tempProcess);
                 processList.remove(tempProcess);
             }
         }

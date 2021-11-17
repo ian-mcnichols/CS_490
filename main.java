@@ -21,8 +21,6 @@ public class main extends Thread {
         // Create a main thread to help with execution timing
         Thread mainThread = Thread.currentThread();
 
-        // Get process list from input file
-        List<Process> processList = Utility.readFile();
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -47,10 +45,8 @@ public class main extends Thread {
         //</editor-fold>
 
         // Create GUI
-        SchedulerGUI gui = new SchedulerGUI(processList);
+        SchedulerGUI gui = new SchedulerGUI();
         // List to store processes removed from input list when placed in waiting list
-        List<Process> removedProcesses = new ArrayList<>();
-        Process tempProcess = null;
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -65,23 +61,14 @@ public class main extends Thread {
 
         // While the program is running, loop every "clock cycle" and do certain actions
         while(gui.checkProgramRunning()) {
-            // Get current time
-            startTime = System.currentTimeMillis();
+            mainThread.sleep(Utility.getExecutionSpeed());
             // If system is running
             if (gui.checkSystemRunning()) {
                 // Increase "clock"
                 Utility.increaseSystemClock();
-                // Check if any processes are available to add to waiting queue
                 }
-                // Calculate and display current throughput
-                gui.setThroughputLabel();
-            }
-
-            // If the loop took less than the time set for one cycle
-            elapsedTime = System.currentTimeMillis() - startTime;
-            if (elapsedTime < Utility.getExecutionSpeed()) {
-                // Sleep for any remaining time
-                mainThread.sleep(Utility.getExecutionSpeed() - elapsedTime);
-            }
+            // Calculate and display current throughput
+            gui.setThroughputLabel();
         }
     }
+}

@@ -23,12 +23,13 @@ public abstract class thread_run implements Runnable {
     public void run() {
         // Track my current thread.
         me = Thread.currentThread();
+        List<Process> processList = Utility.readFile();
         try {
             // While there is work to be done
             while (!finished()) {
+                System.out.println("Process list: " + processList.toString());
                 // Get process list from input file
-                Utility.checkForProcesses(processList);
-
+                Utility.checkForProcessesHRRN(processList);
                 // If thread has been paused, sleep for one cycle at a time until resumed.
                 while (threadPaused){
                     Thread.sleep(Utility.getExecutionSpeed());
@@ -147,6 +148,7 @@ public abstract class thread_run implements Runnable {
                                   int thread_no) {
         // That's the thread they can pause/resume.
         return new StepperThread(stepper, GUI, thread_no);
+
     }
 
     // One of these must be used.
@@ -174,7 +176,7 @@ public abstract class thread_run implements Runnable {
     }
 
     // Variables
-    List<Process> processList = Utility.readFile();
+    List<Process> processList;
     // Flag to cancel the whole process.
     private volatile boolean cancelled = false;
     // The exception that cause it to finish.
