@@ -14,6 +14,7 @@ CS 490
 Fall 2021
 */
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Generates a thread that opens a process, runs it, and then looks for another until no more processes remain
@@ -23,21 +24,26 @@ public abstract class thread_run implements Runnable {
     public void run() {
         // Track my current thread.
         me = Thread.currentThread();
+
+        // Check for processes that arrive at time 0
+        checkForProcessesHRRN();
+        GUI.populateProcessTable();
         try {
             // While there is work to be done
             while (!finished()) {
+//                System.out.println("Process list: " + processList);
                 // If thread has been paused, sleep for one cycle at a time until resumed.
                 while (threadPaused){
                     Thread.sleep(Utility.getExecutionSpeed());
                 }
                 // If waitingProcess list is not empty
-                if (!Utility.getWaitingProcessListHRRN().isEmpty()) {
+                if (!waitingProcessesHRRN.isEmpty()) {
                     // Get a process from waiting list
-                    currentProcess = Utility.getHRRNProcess();
+                    currentProcess = getNextProcess();
                     System.out.println("Starting process " + currentProcess.getProcessId());
                     // Remove process from waiting list
                     System.out.println("Removing process " + currentProcess.getProcessId());
-                    Utility.removeWaitingProcessHRRN(currentProcess);
+                    waitingProcessesHRRN.remove(currentProcess);
                     // Update GUI process table
                     GUI.populateProcessTable();
                     // Update CPU text field
@@ -51,32 +57,34 @@ public abstract class thread_run implements Runnable {
                     while (workCounter < currentProcess.getServiceTime()) {
                         // If thread has been paused, sleep for one cycle at a time until resumed.
                         while (threadPaused){
-                            Thread.sleep(currentProcess.getServiceTime());
+                            Thread.sleep(Utility.getExecutionSpeed());
                         }
                         // Get current time
                         processStartTime = System.currentTimeMillis();
                         // Update CPU text field
                         GUI.updateCpuTextField(currentProcess, currentServiceTime - workCounter, thread_no);
 
+                        // Increase unit of work done
+                        workCounter +=1;
                         // If the loop took less than the time set for one cycle
                         processElapsedTime = System.currentTimeMillis() - processStartTime;
                         if (processElapsedTime < Utility.getExecutionSpeed()) {
                             // Sleep for any remaining time
                             Thread.sleep(Utility.getExecutionSpeed() - processElapsedTime);
                         }
-                        // Increase unit of work done
-                        workCounter +=1;
-                        // Record current time in case Process is finished
-                        tempFinishTime = Utility.getSystemClock();
+                        // Check for newly entered process
+                        checkForProcessesHRRN();
                     }
 
                     // Add process to finished list
-                    currentProcess.setFinish_time(tempFinishTime);
+                    currentProcess.setFinish_time(Utility.getSystemClock());
                     currentProcess.setTurnaround_time();
                     currentProcess.setNorm_turnaround_time();
-                    Utility.addFinishedProcessHRRN(currentProcess);
+                    finishedProcessesHRRN.add(currentProcess);
                     // Update GUI report table
                     GUI.updateReportTable();
+                    // Update HRRN avg nTAT
+                    GUI.setHRRNLabel();
                     step();
                 }
                 // If there are no waiting processes, sleep for a cycle
@@ -84,7 +92,7 @@ public abstract class thread_run implements Runnable {
                     Thread.sleep(Utility.getExecutionSpeed());
                 }
                 // If all processes have finished running, shut down the thread
-                if (processList.isEmpty() && Utility.getWaitingProcessListHRRN().isEmpty()) {
+                if (processList.isEmpty() && waitingProcessesHRRN.isEmpty()) {
                     GUI.updateCpuTextField(null, -1, thread_no);
                     cancel();
                 }
@@ -140,11 +148,13 @@ public abstract class thread_run implements Runnable {
 
     // Factory to wrap a Stepper in a Pauseable Thread
     public static thread_run make(Stepper stepper,
-                                  List<Process> processList,
                                   SchedulerGUI GUI,
                                   int thread_no) {
         // That's the thread they can pause/resume.
-        return new StepperThread(stepper, processList, GUI, thread_no);
+        // Get process list from file
+        processList = Utility.readFile();
+        return new StepperThread(stepper, GUI, thread_no);
+
     }
 
     // One of these must be used.
@@ -158,10 +168,9 @@ public abstract class thread_run implements Runnable {
     private static class StepperThread extends thread_run {
         private final Stepper stepper;
 
-        StepperThread(Stepper stepper, List<Process> inputList,
+        StepperThread(Stepper stepper,
                       SchedulerGUI GUI, int thread_no) {
             this.stepper = stepper;
-            this.processList = inputList;
             this.GUI = GUI;
             this.thread_no = thread_no;
         }
@@ -172,8 +181,57 @@ public abstract class thread_run implements Runnable {
         }
     }
 
+    public float getResponseRatio(Process checkProcess){
+        int waitTime = Utility.getSystemClock() - checkProcess.getArrivalTime();
+        int burstTime = checkProcess.getServiceTime();
+        return (float) ((float) (waitTime + burstTime) / (float) burstTime);
+    }
+
+    public Process getNextProcess() throws Exception {
+        Process returnProcess = null;
+        float highestRR = -1;
+        System.out.println("Waiting processes: " + waitingProcessesHRRN.toString());
+        for (Process p : waitingProcessesHRRN){
+            System.out.println(p.getProcessId() + " response ratio: " + getResponseRatio(p));
+            if (getResponseRatio(p) > highestRR){
+                returnProcess = p;
+                highestRR = getResponseRatio(p);
+            }
+        }
+        if (returnProcess != null){
+            return returnProcess;
+        }
+        else {
+            throw new Exception("Waiting list empty");
+        }
+    }
+
+    public void checkForProcessesHRRN() {
+        for (int i = 0; i < processList.size(); i++) {
+            Process tempProcess = processList.get(i);
+            // If a process has arrived
+            if (tempProcess.getArrivalTime() <= Utility.getSystemClock()) {
+                System.out.println("Arrival time: " + tempProcess.getArrivalTime());
+                System.out.println("Current time: " + Utility.getSystemClock());
+                // Add the process to the waiting list
+                waitingProcessesHRRN.add(tempProcess);
+                processList.remove(tempProcess);
+            }
+        }
+    }
+
+    public List<Process> getWaitingProcessListHRRN() {
+        return waitingProcessesHRRN;
+    }
+
+    public List<Process> getFinishedProcessesHRRN() {
+        return finishedProcessesHRRN;
+    }
+
     // Variables
-    List<Process> processList;
+    private static List<Process> processList;
+    private List<Process> waitingProcessesHRRN = new ArrayList<>();
+    private List<Process> finishedProcessesHRRN = new ArrayList<>();
     // Flag to cancel the whole process.
     private volatile boolean cancelled = false;
     // The exception that cause it to finish.

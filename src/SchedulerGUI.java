@@ -26,10 +26,8 @@ public class SchedulerGUI extends javax.swing.JFrame {
     /**
      * Creates new form SchedulerGUI
      */
-    public SchedulerGUI(List<Process> processList) {
+    public SchedulerGUI() {
         initComponents();
-        // Copy process list
-        this.processList = processList;
         // Setup process table
         hrrnProcessQueueModel = (DefaultTableModel) hrrnProcessQueueTable.getModel();
         rrProcessQueueModel = (DefaultTableModel) rrProcessQueueTable.getModel();
@@ -40,9 +38,8 @@ public class SchedulerGUI extends javax.swing.JFrame {
         updateCpuTextField(null, -1, 1);
         updateCpuTextField(null, -1, 2);
 
-
         // Create CPU threads
-        cpu1_thread = thread_run.make(s1, processList, this, 1);
+        cpu1_thread = thread_run.make(s1, this, 1);
     }
 
     // Initial set up for GUI components
@@ -267,7 +264,7 @@ public class SchedulerGUI extends javax.swing.JFrame {
 
         rrTimeSliceLabel.setText("Round Robin Time Slice Length:");
 
-        rrTimeSliceTextArea.setText("100");
+        rrTimeSliceTextArea.setText("5");
         rrTimeSliceTextArea.setSize(new java.awt.Dimension(50, 20));
         rrTimeSliceTextArea.addActionListener(this::rrTimeSliceTextAreaActionPerformed);
 
@@ -279,52 +276,52 @@ public class SchedulerGUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(startButton)
-                                .addGap(40, 40, 40)
-                                .addComponent(pauseButton)
-                                .addGap(353, 353, 353))
                         .addGroup(layout.createSequentialGroup()
+                                .addGap(40, 40, 40)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addGap(431, 431, 431)
-                                                .addComponent(systemStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(hrrnProcessQueueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addGap(40, 40, 40)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addGap(18, 18, 18)
-                                                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addComponent(hrrnProcessQueueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(6, 6, 6)
-                                                                .addComponent(hrrn_nTAT_label, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addGap(30, 30, 30)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(6, 6, 6)
+                                                .addComponent(hrrn_nTAT_label, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(30, 30, 30)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                .addComponent(rrTimeSliceTextArea, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(layout.createSequentialGroup()
                                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                .addComponent(rrTimeSliceTextArea, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addGroup(layout.createSequentialGroup()
-                                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                                .addComponent(rrProcessQueueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                                        .addGap(18, 18, 18)
-                                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addComponent(rrTimeSliceLabel)))
-                                                                .addGroup(layout.createSequentialGroup()
-                                                                        .addComponent(timeUnitLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                        .addComponent(timeUnitTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                        .addComponent(timeUnitLabel2)))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(6, 6, 6)
-                                                                .addComponent(rr_nTAT_label, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                                                .addComponent(rrProcessQueueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGap(18, 18, 18)
+                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(rrTimeSliceLabel)))
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(timeUnitLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(timeUnitTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(timeUnitLabel2)))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(6, 6, 6)
+                                                .addComponent(rr_nTAT_label, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addContainerGap(40, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(startButton)
+                                                .addGap(40, 40, 40)
+                                                .addComponent(pauseButton)
+                                                .addGap(353, 353, 353))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(systemStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(424, 424, 424))))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -435,11 +432,14 @@ public class SchedulerGUI extends javax.swing.JFrame {
             hrrnProcessQueueModel.removeRow(rowCount);
             hrrnProcessQueueTable.revalidate();
         }
-        // Place new data in table
-        for (Process process : Utility.getWaitingProcessListHRRN()) {
-            rowData[0] = process.getProcessId();
-            rowData[1] = process.getServiceTime();
-            hrrnProcessQueueModel.addRow(rowData);
+        // If the waiting process list isn't empty
+        if (!cpu1_thread.getWaitingProcessListHRRN().isEmpty()) {
+            // Place new data in table
+            for (Process process : cpu1_thread.getWaitingProcessListHRRN()) {
+                rowData[0] = process.getProcessId();
+                rowData[1] = process.getServiceTime();
+                hrrnProcessQueueModel.addRow(rowData);
+            }
         }
     }
 
@@ -447,7 +447,7 @@ public class SchedulerGUI extends javax.swing.JFrame {
     public void updateCpuTextField(Process currentProcess, int timeRemaining, int threadNumber) {
         // If updating for thread 1
         if (threadNumber == 1) {
-            cpu1TextArea.setText("\nCPU 1\n");
+            cpu1TextArea.setText("\nCPU 1 (HRRN)\n");
 
             // If system is not running, display process being executed and time remaining
             if (!systemRunningFlag || currentProcess == null) {
@@ -491,7 +491,7 @@ public class SchedulerGUI extends javax.swing.JFrame {
             hrrnReportTable.revalidate();
         }
         // Update table with new information
-        for (Process finishedProcess : Utility.getFinishedProcessesHRRN()) {
+        for (Process finishedProcess : cpu1_thread.getFinishedProcessesHRRN()) {
             rowData[0] = finishedProcess.getProcessId();
             rowData[1] = finishedProcess.getArrivalTime();
             rowData[2] = finishedProcess.getServiceTime();
@@ -502,14 +502,17 @@ public class SchedulerGUI extends javax.swing.JFrame {
         }
     }
 
-    // Update throughput label with current throughput
-    public void setThroughputLabel() {
-        // Calculate current throughput
-//        throughput = (Utility.getFinishedProcessesHRRN().size() / (float) Utility.getSystemClock());
-//        // Create new label
-//        String newLabel = "Current Throughput: " + throughput + " process/unit of time";
-//        // Set new label
-//        throughputLabel.setText(newLabel);
+    // Update HRRN average nTAT label
+    public void setHRRNLabel() {
+        // Calculate current nTAT for HRRN
+        float sum = 0;
+        for (Process p : cpu1_thread.getFinishedProcessesHRRN()) {
+            sum += p.getNorm_turnaround_time();
+        }
+        avgHRRN_nTAT = sum/cpu1_thread.getFinishedProcessesHRRN().size();
+        // Create new label
+        String newLabel = "Current Average nTAT: " + avgHRRN_nTAT;
+        hrrn_nTAT_label.setText(newLabel);
     }
 
     // Check if program is currently running
@@ -536,7 +539,7 @@ public class SchedulerGUI extends javax.swing.JFrame {
     private List<Process> processList;
     private boolean systemRunningFlag = false;
     private boolean programRunning = true;
-    private float throughput = 0;
+    private float avgHRRN_nTAT = 0;
 
     // Thread variables
     private AtomicInteger n = new AtomicInteger();

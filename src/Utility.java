@@ -65,71 +65,11 @@ public final class Utility {
         return processList;
     }
 
-    public static int getResponseRatio(Process checkProcess){
+    public static float getResponseRatio(Process checkProcess){
         int waitTime = Utility.getSystemClock() - checkProcess.getArrivalTime();
         int burstTime = checkProcess.getServiceTime();
-        int responseRatio = (waitTime + burstTime) / burstTime;
-        return responseRatio;
+        return (float) ((waitTime + burstTime) / burstTime);
     }
-
-    public static Process getHRRNProcess() throws Exception {
-        Process returnProcess = null;
-        int highestRR = -1;
-        System.out.println("Waiting processes: " + waitingProcessesHRRN.toString());
-        for (Process p : waitingProcessesHRRN){
-            System.out.println(p.getProcessId() + " response ratio: " + getResponseRatio(p));
-            if (getResponseRatio(p) > highestRR){
-                returnProcess = p;
-                highestRR = getResponseRatio(p);
-            }
-        }
-        if (returnProcess != null){
-            return returnProcess;
-        }
-        else {
-            throw new Exception("Waiting list empty");
-        }
-    }
-
-    // Add finished Process to the finishedProcesses list
-    public static void addFinishedProcessHRRN(Process finished) {
-        finishedProcessesHRRN.add(finished);
-    }
-    public static void addFinishedProcessRR(Process finished) {
-        finishedProcessesRR.add(finished);
-    }
-
-    // Get the list of finished Processes
-    public static List<Process> getFinishedProcessesHRRN() {
-        return finishedProcessesHRRN;
-    }
-    public static List<Process> getFinishedProcessesRR() {
-        return finishedProcessesRR;
-    }
-
-    // Add a Process that has arrived to the waitingProcesses list
-    public static void addWaitingProcessHRRN(Process arrived) {
-        waitingProcessesHRRN.add(arrived);
-    }
-    public static void addWaitingProcessRR(Process arrived) {
-        waitingProcessesRR.add(arrived);
-    }
-
-    // Get the list of waiting Processes
-    public static List<Process> getWaitingProcessListHRRN() {
-        return waitingProcessesHRRN;
-    }
-    public static List<Process> getWaitingProcessListRR() {
-        return waitingProcessesRR;
-    }
-
-    // Get first waiting Process in waitingProcesses
-    public static Process getNextWaitingProcessHRRN() { return waitingProcessesHRRN.get(0); };
-    public static Process getNextWaitingProcessRR() { return waitingProcessesRR.get(0); };
-
-    // Remove waiting Process at index 0 of waitingProcesses
-    public static void removeWaitingProcessHRRN(Process p) { waitingProcessesHRRN.remove(p); };
-    public static void removeWaitingProcessRR(Process p) { waitingProcessesRR.remove(p); };
 
     // Get current execution speed
     public static int getExecutionSpeed() {
@@ -154,8 +94,6 @@ public final class Utility {
     // Variables
     private static List<Process> finishedProcessesRR = new ArrayList<>();
     private static List<Process> waitingProcessesRR = new ArrayList<>();
-    private static List<Process> waitingProcessesHRRN = new ArrayList<>();
-    private static List<Process> finishedProcessesHRRN = new ArrayList<>();
-    private static int executionSpeed = 500;
+    private static int executionSpeed = 200;
     private static int systemClock = 0;
 }
